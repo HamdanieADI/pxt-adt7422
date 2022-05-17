@@ -50,8 +50,6 @@ namespace HamdanieADI {
             // Enable measurements
             this.writeRegister(ADT7422Register.Config, 0x00); //
 
-            this.setRange(this._range)
-
             return true;
         }
 
