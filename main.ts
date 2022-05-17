@@ -36,7 +36,8 @@ enum ADT7422Register {
 //% weight=100 color=#00A654 icon="\uf085" block="I2C ADT7422"
 namespace HamdanieADI {
     export class ADT7422 {
-
+        private _address: number;
+        
         //% blockId=ADT7422_begin
         //% block="%adt7422|begin"
         public begin(): boolean {
@@ -54,53 +55,11 @@ namespace HamdanieADI {
             return true;
         }
 
-        //% blockId=ADT7422_setrange
-        //% block="%adt7422|set range|$range"
-        //% range.defl=ADT7422Range.R2_G
-        public setRange(range: ADT7422Range = ADT7422Range.R2_G) {
-            /* Read the data format register to preserve bits */
-            let format = this.readRegister(ADT7422Register.DATA_FORMAT);
-
-            /* Update the data rate */
-            format &= ~0x0F;
-            format |= range;
-
-            /* Make sure that the FULL-RES bit is enabled for range scaling */
-            format |= 0x08;
-
-            /* Write the register back to the IC */
-            this.writeRegister(ADT7422Register.DATA_FORMAT, format);
-
-            /* Keep track of the current range (to avoid readbacks) */
-            this._range = range;
-        }
-
-        //% blockId=ADT7422_getrange
-        //% block="%adt7422|get range"
-        public getRange(): ADT7422Range {
-            /* Read the data format register to preserve bits */
-            return this.readRegister(ADT7422Register.DATA_FORMAT) & 0x03;
-        }
-
-        //% blockId=ADT7422_setdatarate
-        //% block="%adt7422|set datarate|$dataRate"
-        //% dataRate.defl=ADT7422DataRate.D0_10_HZ
-        public setDataRate(dataRate: ADT7422DataRate = ADT7422DataRate.D0_10_HZ) {
-            this.writeRegister(ADT7422Register.BW_RATE, dataRate);
-        }
-
-        //% blockId=ADT7422_getdatarate
-        //% block="%adt7422|get datarate"
-        public getDataRate(): ADT7422DataRate {
-            /* Read the data format register to preserve bits */
-            return this.readRegister(ADT7422Register.BW_RATE) & 0x0F;
-        }
-
         //% blockId=ADT7422_writeRegister
         //% block="%adt7422|write byte register $reg|value $value"
-        //% reg.defl=ADT7422Register.DEVID
+        //% reg.defl=ADT7422Register.ID
         //% value.defl=0
-        public writeRegister(reg: ADT7422Register = ADT7422Register.DEVID, value: number = 0): void {
+        public writeRegister(reg: ADT7422Register = ADT7422Register.ID, value: number = 0): void {
             let buf = pins.createBuffer(2)
             buf[0] = reg
             buf[1] = value
@@ -109,47 +68,19 @@ namespace HamdanieADI {
 
         //% blockId=ADT7422_readRegister
         //% block="%adt7422|read byte register $reg"
-        //% reg.defl=ADT7422Register.DEVID
-        public readRegister(reg: ADT7422Register = ADT7422Register.DEVID): number {
+        //% reg.defl=ADT7422Register.ID
+        public readRegister(reg: ADT7422Register = ADT7422Register.ID): number {
             pins.i2cWriteNumber(this._address, reg, NumberFormat.UInt8LE)
             return pins.i2cReadNumber(this._address, NumberFormat.UInt8LE)
-        }
-
-        //% blockId=ADT7422_readRegisterI16
-        //% block="%adt7422|read word register $reg"
-        //% reg.defl=ADT7422Register.DATAX0
-        public readRegisterI16(reg: ADT7422Register = ADT7422Register.DATAX0): number {
-            pins.i2cWriteNumber(this._address, reg, NumberFormat.UInt8LE)
-            return pins.i2cReadNumber(this._address, NumberFormat.Int16LE)
         }
 
         //% blockId=ADT7422_getDeviceID
         //% block="%adt7422|deviceId"
         //% blockSetVariable=id
         public getDeviceID(): number {
-            return this.readRegister(ADT7422Register.DEVID)
+            return this.readRegister(ADT7422Register.ID)
         }
 
-        //% blockId=ADT7422_get
-        //% block="%adt7422|get|$dim"
-        //% dim.defl=ADT7422Dimension.X
-        public get(dim: ADT7422Dimension = ADT7422Dimension.X): number {
-            if (dim == ADT7422Dimension.X)
-                return this.readRegisterI16(ADT7422Register.DATAX0)
-            else if (dim == ADT7422Dimension.Y)
-                return this.readRegisterI16(ADT7422Register.DATAX0)
-            else if (dim == ADT7422Dimension.Z)
-                return this.readRegisterI16(ADT7422Register.DATAZ0)
-            return 0;
-        }
     }
 
-    //% blockId=ADT7422_new
-    //% block="new address $address|range $range"
-    //% address.defl=83
-    //% range.defl=ADT7422Range.R2_G
-    //% blockSetVariable=adt7422
-    export function ADT7422New(address: number = 83, range: ADT7422Range = ADT7422Range.R2_G): ADT7422 {
-        return new ADT7422(address, range)
-    }
 }
