@@ -38,6 +38,13 @@ namespace HamdanieADI {
     export class ADT7422 {
         private _address: number;
         
+        //% blockId=ADT7422_constructor
+        //% block="constructor$address"
+        //% address.defl=0x48
+        public constructor(address: number = 0x48) {
+            this._address = address;
+        }
+        
         //% blockId=ADT7422_begin
         //% block="%adt7422|begin"
         public begin(): boolean {
