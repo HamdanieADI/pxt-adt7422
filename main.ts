@@ -83,9 +83,9 @@ namespace HamdanieADI {
     
     //% blockId=ADT7422_new
     //% block="new address $address"
-    // address.defl=72
-    //% blockSetVariable=ADT7422
-    export function ADT7422New(address: number=72): ADT7422 {
-        return new ADT7422(address);
+    //% address.defl=72
+    //% blockSetVariable=adt7422
+    export function ADT7422New(address: number = 72): ADT7422 {
+        return new ADT7422(address)
     }
 }
